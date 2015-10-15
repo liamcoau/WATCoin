@@ -1,4 +1,4 @@
-# List of Litecoin IPv4 nodes sorted by 30 day availability, block height and version.
+# List of WATCoin IPv4 nodes sorted by 30 day availability, block height and version.
 
 192.241.166.112:9333
 50.31.189.52:9333

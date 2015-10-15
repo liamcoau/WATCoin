@@ -60,11 +60,11 @@ bin_PROGRAMS =
 TESTS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += litecoind
+  bin_PROGRAMS += watcoind
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += litecoin-cli litecoin-tx
+  bin_PROGRAMS += watcoin-cli watcoin-tx
 endif
 
 .PHONY: FORCE
@@ -292,8 +292,8 @@ libbitcoin_cli_a_SOURCES = \
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# litecoind binary #
-litecoind_LDADD = \
+# watcoind binary #
+watcoind_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UNIVALUE) \
@@ -304,35 +304,35 @@ litecoind_LDADD = \
   $(LIBSECP256K1)
 
 if ENABLE_WALLET
-litecoind_LDADD += libbitcoin_wallet.a
+watcoind_LDADD += libbitcoin_wallet.a
 endif
-litecoind_SOURCES = bitcoind.cpp
+watcoind_SOURCES = bitcoind.cpp
 #
 
 if TARGET_WINDOWS
-litecoind_SOURCES += bitcoind-res.rc
+watcoind_SOURCES += bitcoind-res.rc
 endif
 
-litecoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
-litecoind_CPPFLAGS = $(BITCOIN_INCLUDES)
-litecoind_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+watcoind_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+watcoind_CPPFLAGS = $(BITCOIN_INCLUDES)
+watcoind_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 # bitcoin-cli binary #
-litecoin_cli_LDADD = \
+watcoin_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBBITCOIN_UTIL) \
   $(BOOST_LIBS) \
   $(SSL_LIBS) \
   $(CRYPTO_LIBS)
 
-litecoin_cli_SOURCES = \
+watcoin_cli_SOURCES = \
   bitcoin-cli.cpp
 
-litecoin_cli_CPPFLAGS = $(BITCOIN_INCLUDES)
+watcoin_cli_CPPFLAGS = $(BITCOIN_INCLUDES)
 #
 
 # bitcoin-tx binary #
-litecoin_tx_LDADD = \
+watcoin_tx_LDADD = \
   $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
@@ -341,15 +341,15 @@ litecoin_tx_LDADD = \
   $(BOOST_LIBS) \
   $(CRYPTO_LIBS)
 
-litecoin_tx_SOURCES = bitcoin-tx.cpp
-litecoin_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
+watcoin_tx_SOURCES = bitcoin-tx.cpp
+watcoin_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
 #
-litecoin_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+watcoin_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-litecoin_cli_SOURCES += bitcoin-cli-res.rc
+watcoin_cli_SOURCES += bitcoin-cli-res.rc
 endif
-litecoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+watcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/bitcoinconsensus.h
