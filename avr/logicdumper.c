@@ -6,13 +6,13 @@
 
 #define WATCH PD7
 
-#define STRB1 PC1
-#define STRB2 PC3
-#define DAT1 PC0
-#define DAT2 PC2
+#define STRB1 PA1
+#define STRB2 PA3
+#define DAT1 PA0
+#define DAT2 PA2
 
 #include <stdio.h>
-
+#include "I2C_slave.h"
 static int uart_putchar(char c, FILE *stream);
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL,_FDEV_SETUP_WRITE);
 static int uart_putchar(char c, FILE *stream)
@@ -42,22 +42,27 @@ uint32_t generate_crc32 (uint32_t crc, unsigned char *buffer, int length) {
 
 int main(){
 
+DDRB |= (1<<PB0);
 UCSRC |= ((1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)); //Serial magic sauce. Set # of data bits, and the URSEL register to get around odd quirk in this gen. of AVR archetecture.
-
-UBRRL=25; // 38400bps.
+//Set UCPOL, UMSEL
+UBRRL=207; // 38400bps.
 UBRRH=0;
 
 //UCSRA |= (1<<U2X);
+SREG |= (1<<7); //These two lines enable interrupts.
+sei();
+
+I2C_init(0x32);
 
 //UCSRC |= ((1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0));
 
-UCSRB |= ((1<<RXEN) | (1<<TXEN) | (1<<UDRIE)); // Enable RX,TX, and transmit interrupt.
+UCSRB |= ((1<<TXEN)|(1<<RXEN)); // Enable RX,TX, and transmit interrupt.
 
 stdout = &mystdout;
 
 UDR='B';
 
-PORTC |= (1<<PC4)||(1<<PC5)||(1<<PC6)||(1<<PC7);
+PORTA |= (1<<PA2)|(1<<PA3)|(1<<PA4)|(1<<PA5)|(1<<PA6)|(1<<PA7);
 
 DDRD &= ~(1<<PD7);
 
@@ -82,10 +87,11 @@ uint8_t lastpinc=0xFF;
 
 
 while(1){
+	UDR='Z';
 while(!(PIND & (1<<PD7))){ // While CP is low.
 
-if(PINC != lastpinc){
-lastpinc=PINC;
+if(PINA != lastpinc){
+lastpinc=PINA;
 	if(! (lastpinc & (1<<STRB1))) { //If strobe is low...
 		if( ! (lastpinc & (1<<DAT1))){ // If it's a one...
 			//The first one is special - it marks the start sentinal.
@@ -109,6 +115,7 @@ lastpinc=PINC;
 if(indext1 > 0){
 	uint32_t crcval=generate_crc32(0x01234567,t1bytes,indext1);
 	printf("%x", crcval);
+	memcpy(txbuffer,&crcval,sizeof(crcval));
 	indext1=0;
 	bitdex1=6;
 	memset(t1bytes,0,128);
