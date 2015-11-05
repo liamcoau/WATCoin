@@ -41,3 +41,14 @@ Leave that running for a while. Every `yay!!!` you see is a new block that you s
 
 You'll likely wind up with ludicrous numbers of coins with a reasonably powerful GPU - a 750ti mined me ~30000 coins in 40 minutes. Keep at it, or the difficulty will never level off.
 
+
+
+Using uwldap.py
+----
+`import uwldap`
+
+`uwldap.getUser('questid')`
+
+Returns a dict of the form:
+
+`{'qid': 'aj3roth', 'name': 'Alex Roth', 'email': 'alex.roth@uwaterloo.ca'}`

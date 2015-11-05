@@ -45,22 +45,24 @@ int main(){
 DDRB |= (1<<PB0);
 UCSRC |= ((1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)); //Serial magic sauce. Set # of data bits, and the URSEL register to get around odd quirk in this gen. of AVR archetecture.
 //Set UCPOL, UMSEL
-UBRRL=207; // 38400bps.
+UBRRL=25; // 38400bps.
 UBRRH=0;
+UCSRB |= ((1<<TXEN)|(1<<RXEN)); // Enable RX,TX, and transmit interrupt.
+UDR='B';
 
 //UCSRA |= (1<<U2X);
 SREG |= (1<<7); //These two lines enable interrupts.
 sei();
-
+UDR='B';
 I2C_init(0x32);
-
+UDR='B';
 //UCSRC |= ((1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0));
 
-UCSRB |= ((1<<TXEN)|(1<<RXEN)); // Enable RX,TX, and transmit interrupt.
+
 
 stdout = &mystdout;
 
-UDR='B';
+
 
 PORTA |= (1<<PA2)|(1<<PA3)|(1<<PA4)|(1<<PA5)|(1<<PA6)|(1<<PA7);
 
@@ -87,7 +89,6 @@ uint8_t lastpinc=0xFF;
 
 
 while(1){
-	UDR='Z';
 while(!(PIND & (1<<PD7))){ // While CP is low.
 
 if(PINA != lastpinc){
