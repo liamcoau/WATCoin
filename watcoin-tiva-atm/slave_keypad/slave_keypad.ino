@@ -1,4 +1,6 @@
 #include <Keypad.h>
+#include <Wire.h>
+#include <TwoWire.h>
 
 /* ------------------------------------------------------------ */
 /*				Keypad Variables		*/
@@ -31,19 +33,29 @@ byte colPins[COLS] = {
 // Initialize keypad object
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
-char key;
+// Local variables
+TwoWire bus;
 
 void setup(){
-  Serial.begin(9600);  
+  Serial.begin(9600);
+
+  // Initialise to bus 1  
+  bus = TwoWire(1);
+  bus.begin();
 }
 
 void loop(){
 
-  key = keypad.getKey();
+  
+  char key = keypad.getKey();
 
   if (key != NO_KEY){
-    Serial.println(key);
+    bus.beginTransmission(2); // Begin transmission to address #1 (master-atm)
+    bus.write(key);
+    bus.endTransmission();
+    Serial.println("sent");
   }  
+  delay(1);
 }
 
 
