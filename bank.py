@@ -7,12 +7,15 @@ class Bank:
 	_watcoind = "./watcoin/src/watcoind"
 
 	def __init__ (self):
-		subprocess.Popen(["killall", "watcoind"])
+		#This is a race condition. The killall may, or may not run afterwards.
+		#Used call to get around this - it'll wait for completion.
+		subprocess.call(["killall", "watcoind"])
 		try:
 			self.server = subprocess.Popen([self._watcoind, "-irc", "-printtoconsole"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		except Exception as e:
 			print "Hit critical error when starting the watcoin server."
 			raise e
+		print self.server
 
 	def ensureServer (self):
 		while True:
