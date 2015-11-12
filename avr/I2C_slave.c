@@ -6,7 +6,7 @@
 
 void I2C_init(uint8_t address){
 	// load address into TWI address register
-	TWAR = address;
+	TWAR = (address&0xFE);
 	// set the TWCR to enable address matching and enable TWI, clear TWINT, enable TWI interrupt
 	TWCR = (1<<TWIE) | (1<<TWEA) | (1<<TWINT) | (1<<TWEN);
 }
@@ -22,13 +22,14 @@ ISR(TWI_vect){
 	uint8_t data;
 	
 	// own address has been acknowledged
-	if( (TWSR & 0xF8) == TW_SR_SLA_ACK ){  
+	if( (TWSR & 0xF8) == TW_SR_SLA_ACK ){ 
+		UDR='X';
 		buffer_address = 0xFF;
 		// clear TWI interrupt flag, prepare to receive next byte and acknowledge
 		TWCR |= (1<<TWIE) | (1<<TWINT) | (1<<TWEA) | (1<<TWEN); 
 	}
 	else if( (TWSR & 0xF8) == TW_SR_DATA_ACK ){ // data has been received in slave receiver mode
-		
+		UDR='Y';
 		// save the received byte inside data 
 		data = TWDR;
 		
@@ -60,7 +61,7 @@ ISR(TWI_vect){
 		}
 	}
 	else if( (TWSR & 0xF8) == TW_ST_DATA_ACK ){ // device has been addressed to be a transmitter
-		
+		UDR='Z';
 		// copy data from TWDR to the temporary memory
 		data = TWDR;
 		
@@ -68,7 +69,6 @@ ISR(TWI_vect){
 		if( buffer_address == 0xFF ){
 			buffer_address = data;
 		}
-		
 		// copy the specified buffer address into the TWDR register for transmission
 		TWDR = txbuffer[buffer_address];
 		// increment buffer read address
