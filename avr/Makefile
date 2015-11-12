@@ -24,7 +24,7 @@ CC = avr-gcc
 OBJCOPY = avr-objcopy
 CFLAGS += -Wall -g -Os -mmcu=$(MCU) -std=c99
 LDFLAGS +=
-OBJS = $(PROGRAM).o
+OBJS =  I2C_slave.c $(PROGRAM).o
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
@@ -33,7 +33,7 @@ endif
 
 all: $(PROGRAM).hex
 
-$(PROGRAM).elf: $(PROGRAM).o
+$(PROGRAM).elf: I2C_slave.o $(PROGRAM).o
 	@printf "  LD      $(subst $(shell pwd)/,,$(@))\n"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 

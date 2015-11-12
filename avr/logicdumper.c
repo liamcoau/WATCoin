@@ -45,7 +45,7 @@ int main(){
 DDRB |= (1<<PB0);
 UCSRC |= ((1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0)); //Serial magic sauce. Set # of data bits, and the URSEL register to get around odd quirk in this gen. of AVR archetecture.
 //Set UCPOL, UMSEL
-UBRRL=207; // 38400bps.
+UBRRL=103; // 38400bps.
 UBRRH=0;
 
 //UCSRA |= (1<<U2X);
@@ -87,7 +87,6 @@ uint8_t lastpinc=0xFF;
 
 
 while(1){
-	UDR='Z';
 while(!(PIND & (1<<PD7))){ // While CP is low.
 
 if(PINA != lastpinc){
