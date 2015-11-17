@@ -43,7 +43,7 @@ class Bank:
 
 	def transferCoins (self, amount, account, destination):
 		self.ensureServer()
-		result = subprocess.Popen([self._watcoind, "sendfrom", account, ,amount]).communicate()
+		result = subprocess.Popen([self._watcoind, "sendfrom", account, destination ,amount]).communicate()
 
 	def shutdown (self):
 		self.server.terminate()

@@ -18,5 +18,7 @@ def getUser(uid):
 	res={}
 	res["name"]=result_set[0][0][1]["displayName"][0]
 	res["qid"]=uid
+	res["quest"]=uid
+	res["bank"]=uid
 	res["email"]=result_set[0][0][1]["mail"][0]
 	return res
