@@ -29,20 +29,21 @@ class Bank:
 				if info > 0:
 					break
 			time.sleep(1);
+	def getAccountAddress(self,account): # creates an account if one doesn't exist.
+		self.ensureServer()
+		addr = subprocess.Popen([self._watcoind, "getaccountaddress",account], stdout=subprocess.PIPE).communicate()[0]
+		return addr
 
-	def getBankAddress (self):
-		return self._address
-	
 	def getBalance (self, account):
 		self.ensureServer()
-		if account == self._address:
-			balance = subprocess.Popen([self._watcoind, "getbalance"], stdout=subprocess.PIPE).communicate()[0]
-			print balance
-			return balance
+		#if account == self._address:
+		balance = subprocess.Popen([self._watcoind, "getbalance",account], stdout=subprocess.PIPE).communicate()[0]
+		print "Account: "+str(account)+" Bal:" + str(balance)
+		return float(balance)
 
 	def transferCoins (self, amount, account, destination):
 		self.ensureServer()
-		#result = subprocess.Popen([self._watcoind, "sendtoaddress", destination, amount]).communicate()
+		result = subprocess.Popen([self._watcoind, "sendfrom", account, ,amount]).communicate()
 
 	def shutdown (self):
 		self.server.terminate()
