@@ -21,7 +21,8 @@ extern int xchOledMax; // defined in OrbitOled.c
 extern int ychOledMax; // defined in OrbitOled.c
 
 // Local variables
-char    key;
+int   inputLength;
+String input;
 char	chSwtCur;
 char	chSwtPrev;
 bool	fClearOled;
@@ -46,22 +47,24 @@ void setup(){
   // Configure all components of Orbit Booster Pack
 
   // For OLED display, the only method req'd is OrbitOledInit()
-//  DeviceInit();
-  
+  DeviceInit();
+
+  inputLength = 0;
+  input = "";
   // Initialise to bus 1
   bus = TwoWire(1);
   bus.begin(2);
   bus.onReceive(receiveEvent);
+
+  DisplayKeys('\0');
 }
 
 void receiveEvent(int howMany){
-  char c;
+  char key;
   while (bus.available()){
-    c = bus.read();
-    Serial.print(c);
+    key = bus.read();
+    DisplayKeys(key);
   }
-
-  Serial.println();
 }
 
 void DeviceInit()
@@ -73,72 +76,72 @@ void DeviceInit()
    * Use PLL		  -> SYSCTL_USE_PLL
    * Divide by 4	  -> SYSCTL_SYSDIV_4
    */
-  //  SysCtlClockSet(SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_4);
-  //
-  //  /*
-  //   * Enable and Power On All GPIO Ports
-  //   */
-  //  //SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOA | SYSCTL_PERIPH_GPIOB | SYSCTL_PERIPH_GPIOC |
-  //  //						SYSCTL_PERIPH_GPIOD | SYSCTL_PERIPH_GPIOE | SYSCTL_PERIPH_GPIOF);
-  //
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOA );
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOB );
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOC );
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOD );
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOE );
-  //  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOF );
-  //  /*
-  //   * Pad Configure.. Setting as per the Button Pullups on
-  //   * the Launch pad (active low).. changing to pulldowns for Orbit
-  //   */
-  //  GPIOPadConfigSet(SWTPort, SWT1 | SWT2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
-  //
-  //  GPIOPadConfigSet(BTN1Port, BTN1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
-  //  GPIOPadConfigSet(BTN2Port, BTN2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
-  //
-  //  GPIOPadConfigSet(LED1Port, LED1, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
-  //  GPIOPadConfigSet(LED2Port, LED2, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
-  //  GPIOPadConfigSet(LED3Port, LED3, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
-  //  GPIOPadConfigSet(LED4Port, LED4, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
-  //
-  //  /*
-  //   * Initialize Switches as Input
-  //   */
-  //  GPIOPinTypeGPIOInput(SWTPort, SWT1 | SWT2);
-  //
-  //  /*
-  //   * Initialize Buttons as Input
-  //   */
-  //  GPIOPinTypeGPIOInput(BTN1Port, BTN1);
-  //  GPIOPinTypeGPIOInput(BTN2Port, BTN2);
-  //
-  //  /*
-  //   * Initialize LEDs as Output
-  //   */
-  //  GPIOPinTypeGPIOOutput(LED1Port, LED1);
-  //  GPIOPinTypeGPIOOutput(LED2Port, LED2);
-  //  GPIOPinTypeGPIOOutput(LED3Port, LED3);
-  //  GPIOPinTypeGPIOOutput(LED4Port, LED4);
-  //
-  //  /*
-  //   * Enable ADC Periph
-  //   */
-  //  SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-  //
-  //  GPIOPinTypeADC(AINPort, AIN);
-  //
-  //  /*
-  //   * Enable ADC with this Sequence
-  //   * 1. ADCSequenceConfigure()
-  //   * 2. ADCSequenceStepConfigure()
-  //   * 3. ADCSequenceEnable()
-  //   * 4. ADCProcessorTrigger();
-  //   * 5. Wait for sample sequence ADCIntStatus();
-  //   * 6. Read From ADC
-  //   */
-  //  ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-  //  ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH0);
-  //  ADCSequenceEnable(ADC0_BASE, 0);
+   SysCtlClockSet(SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_4);
+
+  /*
+   * Enable and Power On All GPIO Ports
+   */
+  //SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOA | SYSCTL_PERIPH_GPIOB | SYSCTL_PERIPH_GPIOC |
+  //						SYSCTL_PERIPH_GPIOD | SYSCTL_PERIPH_GPIOE | SYSCTL_PERIPH_GPIOF);
+
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOA );
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOB );
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOC );
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOD );
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOE );
+  SysCtlPeripheralEnable(	SYSCTL_PERIPH_GPIOF );
+  /*
+   * Pad Configure.. Setting as per the Button Pullups on
+   * the Launch pad (active low).. changing to pulldowns for Orbit
+   */
+  GPIOPadConfigSet(SWTPort, SWT1 | SWT2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+
+  GPIOPadConfigSet(BTN1Port, BTN1, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+  GPIOPadConfigSet(BTN2Port, BTN2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+
+  GPIOPadConfigSet(LED1Port, LED1, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
+  GPIOPadConfigSet(LED2Port, LED2, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
+  GPIOPadConfigSet(LED3Port, LED3, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
+  GPIOPadConfigSet(LED4Port, LED4, GPIO_STRENGTH_8MA_SC, GPIO_PIN_TYPE_STD);
+
+  /*
+   * Initialize Switches as Input
+   */
+  GPIOPinTypeGPIOInput(SWTPort, SWT1 | SWT2);
+
+  /*
+   * Initialize Buttons as Input
+   */
+  GPIOPinTypeGPIOInput(BTN1Port, BTN1);
+  GPIOPinTypeGPIOInput(BTN2Port, BTN2);
+
+  /*
+   * Initialize LEDs as Output
+   */
+  GPIOPinTypeGPIOOutput(LED1Port, LED1);
+  GPIOPinTypeGPIOOutput(LED2Port, LED2);
+  GPIOPinTypeGPIOOutput(LED3Port, LED3);
+  GPIOPinTypeGPIOOutput(LED4Port, LED4);
+
+  /*
+   * Enable ADC Periph
+   */
+  SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+
+  GPIOPinTypeADC(AINPort, AIN);
+
+  /*
+   * Enable ADC with this Sequence
+   * 1. ADCSequenceConfigure()
+   * 2. ADCSequenceStepConfigure()
+   * 3. ADCSequenceEnable()
+   * 4. ADCProcessorTrigger();
+   * 5. Wait for sample sequence ADCIntStatus();
+   * 6. Read From ADC
+   */
+  ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
+  ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH0);
+  ADCSequenceEnable(ADC0_BASE, 0);
 
   /*
    * Initialize the OLED
@@ -159,14 +162,12 @@ void DeviceInit()
 /*				Loop              		*/
 //* ------------------------------------------------------------ */
 void loop(){
-  //  DisplayKeys();
+
 }
 
-void DisplayKeys(){ 
-
-  char hello[] = { 
-    'H', 'e', 'l', 'l', 'o', '\0'     };
-
+void DisplayKeys(char key){ 
+  
+  // Clears OLED display
   if(fClearOled == true) {
     OrbitOledClear();
     OrbitOledMoveTo(0,0);
@@ -188,12 +189,31 @@ void DisplayKeys(){
   // after each other (no spaces)
 
   OrbitOledSetCursor(0, 0);
+  OrbitOledPutString("Enter WatID #: ");
 
-  OrbitOledPutString(hello);
-  OrbitOledPutString(hello);
-  OrbitOledPutString(hello);
+  // Back button == *
+  // Handles back button and erases last character
+  if(key == '*'){
+    if(inputLength > 0)
+      inputLength--;
+    input.remove(inputLength);
+  }
+  else if (key != '\0'){
+    input += key;
+    inputLength++;
+  }
 
+  // Print out current input String
+  OrbitOledSetCursor(0,1);
+  char stringBuffer[inputLength];
+  // Serial.println(input);
+  input.toCharArray(stringBuffer, (inputLength+1)*sizeof(char));
+  OrbitOledPutString(stringBuffer);
+
+  // Set display to clear next iteration
+  fClearOled = true;
 }
+
 
 
 
